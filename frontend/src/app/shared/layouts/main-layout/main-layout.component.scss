@@ -1,0 +1,10 @@
+.app-shell {
+  background-color: var(--institute-surface, #f8fafc);
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  z-index: 1040;
+}

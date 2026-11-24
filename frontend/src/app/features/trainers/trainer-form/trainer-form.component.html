@@ -1,0 +1,131 @@
+<app-page-header
+  [title]="isEditMode ? 'Edit Trainer' : 'Create Trainer'"
+  subtitle="Configure employee code, contact details, specialization, and status."
+  backLink="/trainers"
+  backLabel="Back to Trainers"
+/>
+
+@if (loading) {
+  <app-loading-indicator message="Loading trainer details..." />
+} @else {
+  <div class="card">
+    <div class="card-body p-4">
+      @if (errorMessage) {
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label for="employeeCode" class="form-label fw-medium">Employee Code *</label>
+            <input
+              id="employeeCode"
+              type="text"
+              class="form-control"
+              formControlName="employeeCode"
+              [class.is-invalid]="hasError('employeeCode')"
+              placeholder="e.g., EMP-001"
+            />
+            @if (hasError('employeeCode')) {
+              <div class="invalid-feedback">Employee code is required (max 20 chars).</div>
+            }
+          </div>
+
+          <div class="col-md-8">
+            <label for="fullName" class="form-label fw-medium">Full Name *</label>
+            <input
+              id="fullName"
+              type="text"
+              class="form-control"
+              formControlName="fullName"
+              [class.is-invalid]="hasError('fullName')"
+              placeholder="e.g., Dr. Jane Smith"
+            />
+            @if (hasError('fullName')) {
+              <div class="invalid-feedback">Full name is required (max 120 chars).</div>
+            }
+          </div>
+
+          <div class="col-md-6">
+            <label for="email" class="form-label fw-medium">Email Address *</label>
+            <input
+              id="email"
+              type="email"
+              class="form-control"
+              formControlName="email"
+              [class.is-invalid]="hasError('email')"
+              placeholder="e.g., jane.smith@institute.com"
+            />
+            @if (hasError('email')) {
+              <div class="invalid-feedback">A valid email address is required (max 150 chars).</div>
+            }
+          </div>
+
+          <div class="col-md-6">
+            <label for="phone" class="form-label fw-medium">Phone Number *</label>
+            <input
+              id="phone"
+              type="tel"
+              class="form-control"
+              formControlName="phone"
+              [class.is-invalid]="hasError('phone')"
+              placeholder="e.g., 9876543210"
+            />
+            @if (hasError('phone')) {
+              <div class="invalid-feedback">Phone must be 10–15 digits (optionally starting with +).</div>
+            }
+          </div>
+
+          <div class="col-md-8">
+            <label for="specialization" class="form-label fw-medium">Specialization *</label>
+            <input
+              id="specialization"
+              type="text"
+              class="form-control"
+              formControlName="specialization"
+              [class.is-invalid]="hasError('specialization')"
+              placeholder="e.g., Java & Spring Boot, Data Science"
+            />
+            @if (hasError('specialization')) {
+              <div class="invalid-feedback">Specialization is required (max 120 chars).</div>
+            }
+          </div>
+
+          <div class="col-md-2">
+            <label for="experienceYears" class="form-label fw-medium">Experience (yrs) *</label>
+            <input
+              id="experienceYears"
+              type="number"
+              min="0"
+              class="form-control"
+              formControlName="experienceYears"
+              [class.is-invalid]="hasError('experienceYears')"
+            />
+            @if (hasError('experienceYears')) {
+              <div class="invalid-feedback">Experience must be 0 or more.</div>
+            }
+          </div>
+
+          <div class="col-md-2 d-flex align-items-end">
+            <div class="form-check form-switch mb-2">
+              <input id="active" type="checkbox" class="form-check-input" formControlName="active" />
+              <label for="active" class="form-check-label fw-medium">Active</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <a routerLink="/trainers" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" [disabled]="submitting">
+            @if (submitting) {
+              <span class="spinner-border spinner-border-sm me-1"></span>
+            }
+            {{ isEditMode ? 'Update Trainer' : 'Create Trainer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

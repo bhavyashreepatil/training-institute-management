@@ -1,0 +1,23 @@
+<div class="input-group">
+  <span class="input-group-text bg-white text-muted">
+    <i class="bi bi-search"></i>
+  </span>
+  <input
+    type="text"
+    class="form-control"
+    [placeholder]="placeholder"
+    [ngModel]="value"
+    (ngModelChange)="onInputChange($event)"
+    aria-label="Search records"
+  />
+  @if (value) {
+    <button
+      type="button"
+      class="btn btn-outline-secondary"
+      title="Clear search"
+      (click)="clearSearch()"
+    >
+      <i class="bi bi-x-lg"></i>
+    </button>
+  }
+</div>

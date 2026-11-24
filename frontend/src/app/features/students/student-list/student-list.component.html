@@ -1,0 +1,110 @@
+<app-page-header title="Students" subtitle="Manage student profiles, contact details, and academic status.">
+  <div actions>
+    <a routerLink="/students/new" class="btn btn-primary btn-sm">
+      <i class="bi bi-plus-lg me-1"></i>New Student
+    </a>
+  </div>
+</app-page-header>
+
+@if (errorMessage) {
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="errorMessage = ''"></button>
+  </div>
+}
+@if (successMessage) {
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ successMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="successMessage = ''"></button>
+  </div>
+}
+
+<div class="card">
+  <div class="card-header bg-white py-3">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <app-search-bar
+          placeholder="Search by code, name, or email..."
+          [value]="searchTerm"
+          (valueChange)="onSearchChange($event)"
+        />
+      </div>
+      <div class="col-md-3">
+        <select
+          class="form-select"
+          [(ngModel)]="statusFilter"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filter by student status"
+        >
+          @for (opt of statusOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    @if (loading) {
+      <app-loading-indicator message="Loading students..." />
+    } @else if (students.length === 0) {
+      <app-empty-state
+        icon="bi-people"
+        title="No students found"
+        description="Create a new student or clear your search filter."
+      >
+        <a routerLink="/students/new" class="btn btn-primary btn-sm">Add Student</a>
+      </app-empty-state>
+    } @else {
+      <app-data-table [columns]="columns" [items]="students" trackKey="id">
+        <ng-template #rowTemplate let-student>
+          <tr>
+            <td class="fw-semibold text-primary">{{ student.studentCode }}</td>
+            <td>
+              <a [routerLink]="['/students', student.id]" class="text-decoration-none fw-medium text-dark">
+                {{ student.fullName }}
+              </a>
+            </td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.phone }}</td>
+            <td>{{ student.dateOfBirth ? (student.dateOfBirth | date: 'dd MMM yyyy') : '—' }}</td>
+            <td>
+              <span class="badge"
+                [class.bg-success]="student.status === 'ACTIVE'"
+                [class.bg-secondary]="student.status === 'INACTIVE'"
+                [class.bg-primary]="student.status === 'GRADUATED'"
+                [class.bg-danger]="student.status === 'DROPPED'"
+              >{{ student.status }}</span>
+            </td>
+            <td class="text-end text-nowrap">
+              <a [routerLink]="['/students', student.id]" class="btn btn-sm btn-outline-secondary me-1" title="View details">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a [routerLink]="['/students', student.id, 'edit']" class="btn btn-sm btn-outline-primary me-1" title="Edit student">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                title="Delete student"
+                (click)="requestDelete(student)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+      </app-data-table>
+    }
+  </div>
+</div>
+
+<app-confirmation-dialog
+  [visible]="studentToDelete !== null"
+  title="Delete Student"
+  [message]="'Delete student ' + (studentToDelete?.studentCode ?? '') + ' - ' + (studentToDelete?.fullName ?? '') + '?'"
+  confirmLabel="Delete"
+  [busy]="deleting"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

@@ -1,0 +1,21 @@
+/* Global SCSS theme for Training Institute Management Portal */
+
+:root {
+  --institute-primary: #1d4ed8;
+  --institute-primary-dark: #1e40af;
+  --institute-surface: #f8fafc;
+  --institute-border: #e2e8f0;
+  --institute-sidebar-width: 260px;
+}
+
+body {
+  background-color: var(--institute-surface);
+  color: #0f172a;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+}
+
+.card {
+  border-color: var(--institute-border);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}

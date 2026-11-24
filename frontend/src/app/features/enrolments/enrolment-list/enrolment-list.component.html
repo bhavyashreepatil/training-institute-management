@@ -1,0 +1,121 @@
+<app-page-header title="Enrolments" subtitle="Enrol students into cohorts and track attendance.">
+  <div actions>
+    <a routerLink="/enrolments/new" class="btn btn-primary btn-sm">
+      <i class="bi bi-plus-lg me-1"></i>New Enrolment
+    </a>
+  </div>
+</app-page-header>
+
+@if (errorMessage) {
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="errorMessage = ''"></button>
+  </div>
+}
+@if (successMessage) {
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ successMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="successMessage = ''"></button>
+  </div>
+}
+
+<div class="card">
+  <div class="card-header bg-white py-3">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <app-search-bar
+          placeholder="Search by student, batch, or course..."
+          [value]="searchTerm"
+          (valueChange)="onSearchChange($event)"
+        />
+      </div>
+      <div class="col-md-3">
+        <select
+          class="form-select"
+          [(ngModel)]="statusFilter"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filter by enrolment status"
+        >
+          <option value="ALL">All Statuses</option>
+          <option value="ENROLLED">Enrolled</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="DROPPED">Dropped</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    @if (loading) {
+      <app-loading-indicator message="Loading enrolments..." />
+    } @else if (filteredEnrolments.length === 0) {
+      <app-empty-state
+        icon="bi-clipboard-check"
+        title="No enrolments found"
+        description="Enrol a student into an active batch or clear your search filter."
+      >
+        <a routerLink="/enrolments/new" class="btn btn-primary btn-sm">New Enrolment</a>
+      </app-empty-state>
+    } @else {
+      <app-data-table [columns]="columns" [items]="filteredEnrolments" trackKey="id">
+        <ng-template #rowTemplate let-enrolment>
+          <tr>
+            <td>
+              <a [routerLink]="['/students', enrolment.studentId]" class="text-decoration-none fw-medium text-dark">
+                {{ enrolment.studentName }}
+              </a>
+              <div class="text-muted small">{{ enrolment.studentCode }}</div>
+            </td>
+            <td>
+              <a [routerLink]="['/batches', enrolment.batchId]" class="text-decoration-none fw-medium">
+                {{ enrolment.batchCode }}
+              </a>
+              <div class="text-muted small">{{ enrolment.batchName }}</div>
+            </td>
+            <td>{{ enrolment.courseTitle }}</td>
+            <td class="text-nowrap">{{ enrolment.enrolmentDate }}</td>
+            <td>{{ enrolment.attendancePercentage | number: '1.1-2' }}%</td>
+            <td><app-status-badge [status]="enrolment.status" /></td>
+            <td class="text-end text-nowrap">
+              <a [routerLink]="['/enrolments', enrolment.id]" class="btn btn-sm btn-outline-secondary me-1" title="View details">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a [routerLink]="['/enrolments', enrolment.id, 'edit']" class="btn btn-sm btn-outline-primary me-1" title="Edit enrolment">
+                <i class="bi bi-pencil"></i>
+              </a>
+              @if (enrolment.status === 'ENROLLED') {
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-warning me-1"
+                  title="Drop student"
+                  (click)="requestAction('drop', enrolment)"
+                >
+                  <i class="bi bi-person-dash"></i>
+                </button>
+              }
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                title="Delete enrolment"
+                (click)="requestAction('delete', enrolment)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+      </app-data-table>
+    }
+  </div>
+</div>
+
+<app-confirmation-dialog
+  [visible]="pendingAction !== null"
+  [title]="dialogTitle"
+  [message]="dialogMessage"
+  [confirmLabel]="dialogConfirmLabel"
+  [confirmVariant]="pendingAction?.type === 'drop' ? 'warning' : 'danger'"
+  [busy]="processing"
+  (confirmed)="confirmAction()"
+  (cancelled)="cancelAction()"
+/>

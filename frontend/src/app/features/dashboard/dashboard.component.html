@@ -1,0 +1,183 @@
+<app-page-header
+  title="Operations Dashboard"
+  subtitle="Live overview of courses, trainers, students, batch seat utilization, and attendance."
+>
+  <div actions class="d-flex flex-wrap gap-2">
+    <a routerLink="/enrolments/new" class="btn btn-primary btn-sm">
+      <i class="bi bi-person-plus me-1"></i>New Enrolment
+    </a>
+    <a routerLink="/batches/new" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-calendar-plus me-1"></i>Schedule Batch
+    </a>
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="loadSummary()">
+      <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+    </button>
+  </div>
+</app-page-header>
+
+@if (loading) {
+  <app-loading-indicator message="Loading live institute metrics..." />
+} @else if (errorMessage) {
+  <div class="alert alert-danger d-flex align-items-center justify-content-between" role="alert">
+    <span><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}</span>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="loadSummary()">Retry</button>
+  </div>
+} @else if (summary) {
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl">
+      <div class="card kpi-card h-100 p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-semibold">TOTAL COURSES</span>
+          <span class="kpi-icon bg-primary-subtle text-primary rounded-2"><i class="bi bi-book"></i></span>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ summary.totalCourses }}</div>
+        <div class="small text-muted">{{ summary.activeCourses }} active catalog courses</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl">
+      <div class="card kpi-card h-100 p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-semibold">ACTIVE TRAINERS</span>
+          <span class="kpi-icon bg-info-subtle text-info-emphasis rounded-2"><i class="bi bi-person-badge"></i></span>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ summary.activeTrainers }}</div>
+        <div class="small text-muted">of {{ summary.totalTrainers }} total faculty</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl">
+      <div class="card kpi-card h-100 p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-semibold">ACTIVE STUDENTS</span>
+          <span class="kpi-icon bg-success-subtle text-success rounded-2"><i class="bi bi-people"></i></span>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ summary.activeStudents }}</div>
+        <div class="small text-muted">of {{ summary.totalStudents }} registered learners</div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl">
+      <div class="card kpi-card h-100 p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-semibold">ACTIVE BATCHES</span>
+          <span class="kpi-icon bg-warning-subtle text-warning-emphasis rounded-2"><i class="bi bi-calendar2-week"></i></span>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ summary.activeBatches }}</div>
+        <div class="small text-muted">
+          {{ summary.totalEnrolledSeats }} / {{ summary.totalSeatCapacity }} seats ({{ summary.seatUtilizationPercentage | number: '1.0-1' }}%)
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-12 col-xl">
+      <div class="card kpi-card h-100 p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-semibold">AVG ATTENDANCE</span>
+          <span class="kpi-icon bg-secondary-subtle text-secondary rounded-2"><i class="bi bi-graph-up-arrow"></i></span>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ summary.averageAttendancePercentage | number: '1.2-2' }}%</div>
+        <div class="small text-muted">{{ summary.activeEnrolments }} active enrolments</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card h-100">
+        <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+          <div>
+            <h2 class="h6 fw-bold mb-0">Ongoing &amp; Upcoming Batches — Seat Utilization</h2>
+            <small class="text-muted">Live seat occupancy across active cohorts</small>
+          </div>
+          <a routerLink="/batches" class="btn btn-sm btn-outline-primary">View All Batches</a>
+        </div>
+        <div class="card-body">
+          @if (summary.activeBatchList.length === 0) {
+            <app-empty-state
+              icon="bi-calendar-x"
+              title="No active or upcoming batches"
+              description="Schedule a new batch to begin enrolling students."
+            >
+              <a routerLink="/batches/new" class="btn btn-primary btn-sm">Schedule Batch</a>
+            </app-empty-state>
+          } @else {
+            <div class="d-flex flex-column gap-3">
+              @for (batch of summary.activeBatchList; track batch.id) {
+                <div class="border rounded-2 p-3 bg-light-subtle">
+                  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                    <div>
+                      <a [routerLink]="['/batches', batch.id]" class="fw-semibold text-decoration-none text-dark">
+                        {{ batch.batchName }}
+                      </a>
+                      <span class="text-muted small ms-2">({{ batch.batchCode }})</span>
+                      <div class="small text-muted">
+                        {{ batch.courseTitle }} &middot; Trainer: {{ batch.trainerName }}
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <app-status-badge [status]="batch.status" />
+                      <a [routerLink]="['/batches', batch.id, 'roster']" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-people me-1"></i>Roster
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center justify-content-between small mb-1">
+                    <span class="text-muted">
+                      <strong>{{ batch.enrolledCount }}</strong> / {{ batch.maxCapacity }} enrolled
+                    </span>
+                    <span class="fw-medium" [class.text-danger]="batch.availableSeats === 0">
+                      {{ batch.availableSeats }} seats remaining ({{ getSeatFillPercentage(batch) }}%)
+                    </span>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div
+                      class="progress-bar"
+                      [ngClass]="getProgressBarClass(batch)"
+                      role="progressbar"
+                      [style.width.%]="getSeatFillPercentage(batch)"
+                      [attr.aria-valuenow]="batch.enrolledCount"
+                      aria-valuemin="0"
+                      [attr.aria-valuemax]="batch.maxCapacity"
+                    ></div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-header bg-white py-3">
+          <h2 class="h6 fw-bold mb-0">Quick Navigation</h2>
+        </div>
+        <div class="card-body d-flex flex-column gap-2">
+          <a routerLink="/courses/new" class="btn btn-outline-dark text-start d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-book me-2"></i>Create New Course</span>
+            <i class="bi bi-chevron-right small"></i>
+          </a>
+          <a routerLink="/trainers/new" class="btn btn-outline-dark text-start d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-person-badge me-2"></i>Onboard Trainer</span>
+            <i class="bi bi-chevron-right small"></i>
+          </a>
+          <a routerLink="/students/new" class="btn btn-outline-dark text-start d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-person-plus me-2"></i>Register Student</span>
+            <i class="bi bi-chevron-right small"></i>
+          </a>
+          <a routerLink="/batches/new" class="btn btn-outline-dark text-start d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-calendar2-plus me-2"></i>Schedule New Batch</span>
+            <i class="bi bi-chevron-right small"></i>
+          </a>
+          <a routerLink="/enrolments/new" class="btn btn-outline-primary text-start d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-clipboard-check me-2"></i>Enrol Student in Batch</span>
+            <i class="bi bi-chevron-right small"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+}

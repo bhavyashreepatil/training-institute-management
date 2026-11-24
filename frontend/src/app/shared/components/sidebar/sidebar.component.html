@@ -1,0 +1,42 @@
+<aside class="app-sidebar bg-dark text-white d-flex flex-column" [class.is-open]="isOpen">
+  <div class="d-flex align-items-center justify-content-between px-3 py-3 border-bottom border-secondary-subtle">
+    <a routerLink="/dashboard" class="text-white text-decoration-none d-flex align-items-center gap-2" (click)="onNavigate()">
+      <span class="brand-badge rounded-2 d-inline-flex align-items-center justify-content-center bg-primary text-white">
+        <i class="bi bi-mortarboard-fill"></i>
+      </span>
+      <div>
+        <div class="fw-bold lh-sm">EduOps Portal</div>
+        <small class="text-secondary">Course &amp; Batch Admin</small>
+      </div>
+    </a>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-light d-lg-none"
+      aria-label="Close sidebar"
+      (click)="onNavigate()"
+    >
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <nav class="nav flex-column p-2 gap-1 flex-grow-1" aria-label="Main navigation">
+    @for (item of navItems; track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        class="nav-link sidebar-link d-flex align-items-center gap-2 rounded-2 px-3 py-2"
+        (click)="onNavigate()"
+      >
+        <i class="bi" [ngClass]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="p-3 border-top border-secondary-subtle small text-secondary">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-database-check text-success"></i>
+      <span>Spring Boot + MySQL 8</span>
+    </div>
+  </div>
+</aside>

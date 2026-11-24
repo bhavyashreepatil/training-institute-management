@@ -1,0 +1,190 @@
+<app-page-header
+  [title]="isEditMode ? 'Edit Batch' : 'Schedule Batch'"
+  subtitle="Assign an active course and trainer, set schedule dates, and define seat capacity."
+  backLink="/batches"
+  backLabel="Back to Batches"
+/>
+
+@if (loading) {
+  <app-loading-indicator message="Loading batch form..." />
+} @else {
+  <div class="card">
+    <div class="card-body p-4">
+      @if (errorMessage) {
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label for="batchCode" class="form-label fw-medium">Batch Code *</label>
+            <input
+              id="batchCode"
+              type="text"
+              class="form-control"
+              formControlName="batchCode"
+              [class.is-invalid]="hasError('batchCode')"
+              placeholder="e.g., BTH-2026-01"
+            />
+            @if (hasError('batchCode')) {
+              <div class="invalid-feedback">Batch code is required (max 20 chars).</div>
+            }
+          </div>
+
+          <div class="col-md-8">
+            <label for="batchName" class="form-label fw-medium">Batch Name *</label>
+            <input
+              id="batchName"
+              type="text"
+              class="form-control"
+              formControlName="batchName"
+              [class.is-invalid]="hasError('batchName')"
+              placeholder="e.g., Morning Java Full-Stack Cohort"
+            />
+            @if (hasError('batchName')) {
+              <div class="invalid-feedback">Batch name is required (max 150 chars).</div>
+            }
+          </div>
+
+          <div class="col-md-6">
+            <label for="courseId" class="form-label fw-medium">Course (Active) *</label>
+            <select
+              id="courseId"
+              class="form-select"
+              formControlName="courseId"
+              [class.is-invalid]="hasError('courseId')"
+            >
+              <option [ngValue]="0" disabled>Select an active course...</option>
+              @for (course of courses; track course.id) {
+                <option [ngValue]="course.id">{{ course.courseCode }} - {{ course.title }}</option>
+              }
+            </select>
+            @if (hasError('courseId')) {
+              <div class="invalid-feedback">Please select an active course.</div>
+            }
+          </div>
+
+          <div class="col-md-6">
+            <label for="trainerId" class="form-label fw-medium">Trainer (Active) *</label>
+            <select
+              id="trainerId"
+              class="form-select"
+              formControlName="trainerId"
+              [class.is-invalid]="hasError('trainerId')"
+            >
+              <option [ngValue]="0" disabled>Select an active trainer...</option>
+              @for (trainer of trainers; track trainer.id) {
+                <option [ngValue]="trainer.id">
+                  {{ trainer.employeeCode }} - {{ trainer.fullName }} ({{ trainer.specialization }})
+                </option>
+              }
+            </select>
+            @if (hasError('trainerId')) {
+              <div class="invalid-feedback">Please select an active trainer.</div>
+            }
+          </div>
+
+          <div class="col-md-4">
+            <label for="startDate" class="form-label fw-medium">Start Date *</label>
+            <input
+              id="startDate"
+              type="date"
+              class="form-control"
+              formControlName="startDate"
+              [class.is-invalid]="hasError('startDate')"
+            />
+            @if (hasError('startDate')) {
+              <div class="invalid-feedback">Start date is required.</div>
+            }
+          </div>
+
+          <div class="col-md-4">
+            <label for="endDate" class="form-label fw-medium">End Date *</label>
+            <input
+              id="endDate"
+              type="date"
+              class="form-control"
+              formControlName="endDate"
+              [class.is-invalid]="hasError('endDate') || hasDateRangeError"
+            />
+            @if (hasError('endDate')) {
+              <div class="invalid-feedback">End date is required.</div>
+            } @else if (hasDateRangeError) {
+              <div class="invalid-feedback">End date must be on or after the start date.</div>
+            }
+          </div>
+
+          <div class="col-md-4">
+            <label for="maxCapacity" class="form-label fw-medium">Max Capacity *</label>
+            <input
+              id="maxCapacity"
+              type="number"
+              min="1"
+              class="form-control"
+              formControlName="maxCapacity"
+              [class.is-invalid]="hasError('maxCapacity')"
+            />
+            @if (hasError('maxCapacity')) {
+              <div class="invalid-feedback">Max capacity must be at least 1.</div>
+            }
+          </div>
+
+          <div class="col-md-6">
+            <label for="scheduleTimings" class="form-label fw-medium">Schedule Timings *</label>
+            <input
+              id="scheduleTimings"
+              type="text"
+              class="form-control"
+              formControlName="scheduleTimings"
+              [class.is-invalid]="hasError('scheduleTimings')"
+              placeholder="e.g., Mon-Fri 09:00 AM - 12:00 PM"
+            />
+            @if (hasError('scheduleTimings')) {
+              <div class="invalid-feedback">Schedule timings are required (max 100 chars).</div>
+            }
+          </div>
+
+          <div class="col-md-3">
+            <label for="mode" class="form-label fw-medium">Delivery Mode *</label>
+            <select
+              id="mode"
+              class="form-select"
+              formControlName="mode"
+              [class.is-invalid]="hasError('mode')"
+            >
+              @for (mode of modes; track mode) {
+                <option [value]="mode">{{ mode }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="status" class="form-label fw-medium">Status *</label>
+            <select
+              id="status"
+              class="form-select"
+              formControlName="status"
+              [class.is-invalid]="hasError('status')"
+            >
+              @for (status of statuses; track status) {
+                <option [value]="status">{{ status }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <a routerLink="/batches" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" [disabled]="submitting">
+            @if (submitting) {
+              <span class="spinner-border spinner-border-sm me-1"></span>
+            }
+            {{ isEditMode ? 'Update Batch' : 'Schedule Batch' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

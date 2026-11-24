@@ -1,0 +1,82 @@
+<app-page-header
+  [title]="enrolment ? enrolment.studentName + ' — ' + enrolment.batchCode : 'Enrolment Details'"
+  [subtitle]="enrolment ? enrolment.courseTitle : ''"
+  backLink="/enrolments"
+  backLabel="Back to Enrolments"
+>
+  <div actions class="d-flex gap-2">
+    @if (enrolment) {
+      <a [routerLink]="['/batches', enrolment.batchId, 'roster']" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-people me-1"></i>Batch Roster
+      </a>
+      <a [routerLink]="['/enrolments', enrolment.id, 'edit']" class="btn btn-primary btn-sm">
+        <i class="bi bi-pencil me-1"></i>Edit Enrolment
+      </a>
+    }
+  </div>
+</app-page-header>
+
+@if (loading) {
+  <app-loading-indicator message="Loading enrolment details..." />
+} @else if (errorMessage) {
+  <div class="alert alert-danger">{{ errorMessage }}</div>
+} @else if (enrolment) {
+  <div class="card">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="text-muted small">Student</div>
+          <div>
+            <a [routerLink]="['/students', enrolment.studentId]" class="fw-semibold text-decoration-none">
+              {{ enrolment.studentCode }} - {{ enrolment.studentName }}
+            </a>
+          </div>
+          <div class="text-muted small">{{ enrolment.studentEmail }}</div>
+          <div class="mt-1">
+            <app-status-badge [status]="enrolment.studentStatus" />
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="text-muted small">Batch</div>
+          <div>
+            <a [routerLink]="['/batches', enrolment.batchId]" class="fw-semibold text-decoration-none">
+              {{ enrolment.batchCode }} - {{ enrolment.batchName }}
+            </a>
+          </div>
+          <div class="text-muted small">{{ enrolment.courseTitle }}</div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="text-muted small">Enrolment Status</div>
+          <div class="mt-1">
+            <app-status-badge [status]="enrolment.status" />
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="text-muted small">Enrolment Date</div>
+          <div class="fw-semibold">{{ enrolment.enrolmentDate }}</div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="text-muted small">Attendance Percentage</div>
+          <div class="fw-semibold mb-1">{{ enrolment.attendancePercentage | number: '1.1-2' }}%</div>
+          <div class="progress attendance-progress" role="progressbar" [attr.aria-valuenow]="enrolment.attendancePercentage" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar bg-primary" [style.width.%]="enrolment.attendancePercentage"></div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="text-muted small">Last Updated</div>
+          <div class="fw-semibold">{{ enrolment.updatedAt | date: 'medium' }}</div>
+        </div>
+
+        <div class="col-12">
+          <div class="text-muted small">Remarks</div>
+          <p class="mb-0">{{ enrolment.remarks || 'No remarks recorded.' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

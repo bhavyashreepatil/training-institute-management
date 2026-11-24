@@ -1,0 +1,102 @@
+<app-page-header title="Courses" subtitle="Manage training catalog, durations, fees, and active status.">
+  <div actions>
+    <a routerLink="/courses/new" class="btn btn-primary btn-sm">
+      <i class="bi bi-plus-lg me-1"></i>New Course
+    </a>
+  </div>
+</app-page-header>
+
+@if (errorMessage) {
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="errorMessage = ''"></button>
+  </div>
+}
+@if (successMessage) {
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ successMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="successMessage = ''"></button>
+  </div>
+}
+
+<div class="card">
+  <div class="card-header bg-white py-3">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <app-search-bar
+          placeholder="Search by course code or title..."
+          [value]="searchTerm"
+          (valueChange)="onSearchChange($event)"
+        />
+      </div>
+      <div class="col-md-3">
+        <select
+          class="form-select"
+          [(ngModel)]="statusFilter"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filter by course status"
+        >
+          <option value="ALL">All Statuses</option>
+          <option value="ACTIVE">Active Only</option>
+          <option value="INACTIVE">Inactive Only</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    @if (loading) {
+      <app-loading-indicator message="Loading courses..." />
+    } @else if (courses.length === 0) {
+      <app-empty-state
+        icon="bi-book"
+        title="No courses found"
+        description="Create a new course or clear your search filter."
+      >
+        <a routerLink="/courses/new" class="btn btn-primary btn-sm">Add Course</a>
+      </app-empty-state>
+    } @else {
+      <app-data-table [columns]="columns" [items]="courses" trackKey="id">
+        <ng-template #rowTemplate let-course>
+          <tr>
+            <td class="fw-semibold text-primary">{{ course.courseCode }}</td>
+            <td>
+              <a [routerLink]="['/courses', course.id]" class="text-decoration-none fw-medium text-dark">
+                {{ course.title }}
+              </a>
+            </td>
+            <td>{{ course.durationWeeks }} weeks</td>
+            <td>&#8377;{{ course.fee | number: '1.2-2' }}</td>
+            <td><app-status-badge [status]="course.active" /></td>
+            <td class="text-end text-nowrap">
+              <a [routerLink]="['/courses', course.id]" class="btn btn-sm btn-outline-secondary me-1" title="View details">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a [routerLink]="['/courses', course.id, 'edit']" class="btn btn-sm btn-outline-primary me-1" title="Edit course">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                title="Delete course"
+                (click)="requestDelete(course)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+      </app-data-table>
+    }
+  </div>
+</div>
+
+<app-confirmation-dialog
+  [visible]="courseToDelete !== null"
+  title="Delete Course"
+  [message]="'Delete course ' + (courseToDelete?.courseCode ?? '') + ' - ' + (courseToDelete?.title ?? '') + '?'"
+  confirmLabel="Delete"
+  [busy]="deleting"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

@@ -1,0 +1,49 @@
+@if (visible) {
+  <div class="modal-backdrop fade show"></div>
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow">
+        <div class="modal-header">
+          <h5 class="modal-title fw-semibold">{{ title }}</h5>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            [disabled]="busy"
+            (click)="onCancel()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0 text-secondary">{{ message }}</p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            [disabled]="busy"
+            (click)="onCancel()"
+          >
+            {{ cancelLabel }}
+          </button>
+          <button
+            type="button"
+            class="btn"
+            [ngClass]="'btn-' + confirmVariant"
+            [disabled]="busy"
+            (click)="onConfirm()"
+          >
+            @if (busy) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            }
+            {{ confirmLabel }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

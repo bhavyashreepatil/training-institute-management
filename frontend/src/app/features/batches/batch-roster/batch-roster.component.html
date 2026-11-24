@@ -1,0 +1,141 @@
+<app-page-header
+  [title]="batch ? batch.batchName + ' — Roster' : 'Batch Roster'"
+  [subtitle]="batch ? batch.batchCode + ' · ' + batch.courseTitle : ''"
+  [backLink]="batch ? '/batches/' + batch.id : '/batches'"
+  [backLabel]="batch ? 'Back to Batch Details' : 'Back to Batches'"
+>
+  <div actions>
+    @if (batch) {
+      <a [routerLink]="['/batches', batch.id, 'edit']" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-pencil me-1"></i>Edit Batch
+      </a>
+    }
+  </div>
+</app-page-header>
+
+@if (errorMessage) {
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="errorMessage = ''"></button>
+  </div>
+}
+@if (successMessage) {
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ successMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="successMessage = ''"></button>
+  </div>
+}
+
+@if (loading) {
+  <app-loading-indicator message="Loading batch roster..." />
+} @else if (batch && roster) {
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-3">
+          <div class="text-muted small">Trainer</div>
+          <div class="fw-semibold">{{ batch.trainerName }}</div>
+        </div>
+        <div class="col-md-3">
+          <div class="text-muted small">Schedule</div>
+          <div class="fw-semibold">{{ batch.scheduleTimings }}</div>
+        </div>
+        <div class="col-md-3">
+          <div class="text-muted small">Seats Filled</div>
+          <div class="fw-semibold">{{ batch.enrolledCount }} / {{ batch.maxCapacity }} ({{ batch.availableSeats }} left)</div>
+        </div>
+        <div class="col-md-3">
+          <div class="text-muted small">Average Attendance</div>
+          <div class="fw-semibold">{{ roster.averageAttendancePercentage | number: '1.1-2' }}%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+      <h2 class="h6 fw-bold mb-0">Enrolled Students ({{ enrolments.length }})</h2>
+      <span class="text-muted small">Update attendance % (0–100) and remarks inline.</span>
+    </div>
+    <div class="card-body p-0">
+      @if (enrolments.length === 0) {
+        <app-empty-state
+          icon="bi-people"
+          title="No students enrolled in this batch"
+          description="Enrol students to track attendance and remarks here."
+        />
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Student Code</th>
+                <th>Student</th>
+                <th>Enrolled On</th>
+                <th>Status</th>
+                <th class="attendance-col">Attendance %</th>
+                <th class="remarks-col">Remarks</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (enrolment of enrolments; track enrolment.id) {
+                <tr>
+                  <td class="fw-semibold text-primary">{{ enrolment.studentCode }}</td>
+                  <td>
+                    <a [routerLink]="['/students', enrolment.studentId]" class="text-decoration-none fw-medium text-dark">
+                      {{ enrolment.studentName }}
+                    </a>
+                    <div class="text-muted small">{{ enrolment.studentEmail }}</div>
+                  </td>
+                  <td class="text-nowrap">{{ enrolment.enrolmentDate }}</td>
+                  <td><app-status-badge [status]="enrolment.status" /></td>
+                  <td>
+                    <div class="input-group input-group-sm">
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        class="form-control"
+                        [(ngModel)]="attendanceDrafts[enrolment.id]"
+                        [class.is-invalid]="isInvalidAttendance(enrolment.id)"
+                        [attr.aria-label]="'Attendance percentage for ' + enrolment.studentName"
+                      />
+                      <span class="input-group-text">%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      maxlength="255"
+                      class="form-control form-control-sm"
+                      [(ngModel)]="remarksDrafts[enrolment.id]"
+                      placeholder="Optional remarks..."
+                      [attr.aria-label]="'Remarks for ' + enrolment.studentName"
+                    />
+                  </td>
+                  <td class="text-end text-nowrap">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary"
+                      [disabled]="savingIds[enrolment.id] || isInvalidAttendance(enrolment.id)"
+                      (click)="saveAttendance(enrolment)"
+                    >
+                      @if (savingIds[enrolment.id]) {
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                      } @else {
+                        <i class="bi bi-check2 me-1"></i>
+                      }
+                      Save
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+}

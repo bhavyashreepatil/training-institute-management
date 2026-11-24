@@ -1,0 +1,121 @@
+<app-page-header title="Batches" subtitle="Schedule cohorts, monitor seat capacity, and manage rosters.">
+  <div actions>
+    <a routerLink="/batches/new" class="btn btn-primary btn-sm">
+      <i class="bi bi-plus-lg me-1"></i>New Batch
+    </a>
+  </div>
+</app-page-header>
+
+@if (errorMessage) {
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="errorMessage = ''"></button>
+  </div>
+}
+@if (successMessage) {
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ successMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="successMessage = ''"></button>
+  </div>
+}
+
+<div class="card">
+  <div class="card-header bg-white py-3">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <app-search-bar
+          placeholder="Search by batch code, name, course, or trainer..."
+          [value]="searchTerm"
+          (valueChange)="onSearchChange($event)"
+        />
+      </div>
+      <div class="col-md-3">
+        <select
+          class="form-select"
+          [(ngModel)]="statusFilter"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filter by batch status"
+        >
+          <option value="ALL">All Statuses</option>
+          <option value="UPCOMING">Upcoming</option>
+          <option value="ONGOING">Ongoing</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    @if (loading) {
+      <app-loading-indicator message="Loading batches..." />
+    } @else if (filteredBatches.length === 0) {
+      <app-empty-state
+        icon="bi-calendar2-week"
+        title="No batches found"
+        description="Create a new batch or clear your search filter."
+      >
+        <a routerLink="/batches/new" class="btn btn-primary btn-sm">Schedule Batch</a>
+      </app-empty-state>
+    } @else {
+      <app-data-table [columns]="columns" [items]="filteredBatches" trackKey="id">
+        <ng-template #rowTemplate let-batch>
+          <tr>
+            <td class="fw-semibold text-primary">{{ batch.batchCode }}</td>
+            <td>
+              <a [routerLink]="['/batches', batch.id]" class="text-decoration-none fw-medium text-dark">
+                {{ batch.batchName }}
+              </a>
+            </td>
+            <td>{{ batch.courseTitle }}</td>
+            <td>{{ batch.trainerName }}</td>
+            <td class="text-nowrap small">
+              <div>{{ batch.startDate }} to {{ batch.endDate }}</div>
+              <div class="text-muted">{{ batch.scheduleTimings }}</div>
+            </td>
+            <td class="seat-cell">
+              <div class="d-flex justify-content-between small fw-medium mb-1">
+                <span>{{ batch.enrolledCount }} / {{ batch.maxCapacity }}</span>
+                <span class="text-muted">{{ batch.availableSeats }} left</span>
+              </div>
+              <div class="progress seat-progress" role="progressbar" [attr.aria-valuenow]="seatUtilizationPercent(batch)" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar" [ngClass]="seatBarClass(batch)" [style.width.%]="seatUtilizationPercent(batch)"></div>
+              </div>
+            </td>
+            <td><app-status-badge [status]="batch.mode" /></td>
+            <td><app-status-badge [status]="batch.status" /></td>
+            <td class="text-end text-nowrap">
+              <a [routerLink]="['/batches', batch.id]" class="btn btn-sm btn-outline-secondary me-1" title="View details">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a [routerLink]="['/batches', batch.id, 'roster']" class="btn btn-sm btn-outline-info me-1" title="Manage roster & attendance">
+                <i class="bi bi-people"></i>
+              </a>
+              <a [routerLink]="['/batches', batch.id, 'edit']" class="btn btn-sm btn-outline-primary me-1" title="Edit batch">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                title="Delete batch"
+                (click)="requestDelete(batch)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+      </app-data-table>
+    }
+  </div>
+</div>
+
+<app-confirmation-dialog
+  [visible]="batchToDelete !== null"
+  title="Delete Batch"
+  [message]="'Delete batch ' + (batchToDelete?.batchCode ?? '') + ' - ' + (batchToDelete?.batchName ?? '') + '?'"
+  confirmLabel="Delete"
+  [busy]="deleting"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>
