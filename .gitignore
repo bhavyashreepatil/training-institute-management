@@ -27,6 +27,7 @@ yarn-error.log*
 
 # IDE & Editors
 .idea/
+/.railway/
 *.iml
 *.ipr
 *.iws
