@@ -5,7 +5,7 @@ An institute operations portal for managing courses, trainers, students, batches
 ## Tech Stack
 
 - **Frontend:** Angular 20.x (Standalone Components, Reactive Forms, Bootstrap 5.x, SCSS)
-- **Backend:** Java 21, Spring Boot 3.5.x REST API, Spring Data JPA, Maven Wrapper (`mvnw.cmd` / `mvnw`)
+- **Backend:** Java 25 LTS, Spring Boot 3.5.x REST API, Spring Data JPA, Maven Wrapper (`mvnw.cmd` / `mvnw`)
 - **Database:** MySQL 8.x (InnoDB, `institute_db`)
 - **Testing:** JUnit 5, Mockito, Spring Boot Test (H2 for isolated tests), Karma + Jasmine (`ChromeHeadless`)
 
@@ -22,7 +22,7 @@ training-institute-management/
 
 ## Prerequisites (Windows)
 
-- **JDK 21+** (`java -version`)
+- **JDK 25 LTS** (`java -version`)
 - **Node.js 20+ & npm** (`node -v`, `npm -v`)
 - **MySQL Server 8.x** (`mysql --version`)
 
@@ -101,6 +101,8 @@ npm.cmd test -- --watch=false --browsers=ChromeHeadless
 ```
 
 ## Documentation & Postman
+
+- **Production Deployment:** [documentation/PRODUCTION_DEPLOYMENT.md](documentation/PRODUCTION_DEPLOYMENT.md)
 
 - **REST API Reference:** [documentation/API_DOCUMENTATION.md](documentation/API_DOCUMENTATION.md)
 - **Database Design & ER Diagram:** [documentation/DATABASE_DESIGN.md](documentation/DATABASE_DESIGN.md)

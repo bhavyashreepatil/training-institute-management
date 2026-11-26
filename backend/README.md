@@ -2,6 +2,8 @@
 
 Spring Boot 3.5.x REST API for the Training Institute Course and Batch Management System.
 
+Requires JDK 25 LTS.
+
 ## Environment Variables
 
 Configure the following environment variables (see `.env.example`):
