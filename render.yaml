@@ -2,7 +2,7 @@ services:
   - type: web
     name: training-institute-management-api
     runtime: docker
-    plan: starter
+    plan: free
     rootDir: backend
     dockerfilePath: ./Dockerfile
     dockerContext: .

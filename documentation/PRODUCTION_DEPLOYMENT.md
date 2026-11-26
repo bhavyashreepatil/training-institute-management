@@ -2,6 +2,8 @@
 
 The Angular frontend is deployed to Vercel. The Spring Boot API runs as a Docker web service on Render, and MySQL runs on Railway. The API URL and database credentials are deployment settings; do not commit them.
 
+> The selected Render free plan is for a demo, not production: the service can spin down while idle. Railway MySQL usage and public TCP egress may still incur charges.
+
 ## 1. Provision MySQL on Railway
 
 1. Create a MySQL service in Railway and choose a region close to the Render service.
@@ -11,7 +13,7 @@ The Angular frontend is deployed to Vercel. The Spring Boot API runs as a Docker
 
 ## 2. Deploy the API on Render
 
-The root `render.yaml` defines a paid Starter web service. Link the repository to Render and deploy the Blueprint. Set the prompted variables using the Railway public connection details:
+The root `render.yaml` defines a free web service for the demo. Link the repository to Render and deploy the Blueprint. Set the prompted variables using the Railway public connection details:
 
 - `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`
 - `CORS_ALLOWED_ORIGINS` to the exact Vercel origin, for example `https://your-project.vercel.app`
@@ -46,5 +48,5 @@ Set `CORS_ALLOWED_ORIGINS` on Render to the final Vercel production origin. Rede
 - Confirm the Vercel build uses the Render HTTPS API URL, not localhost.
 - Confirm API CORS allows only the intended Vercel origin.
 - Confirm the database uses TLS and credentials are only in provider environment settings.
-- Use a paid, always-on Render instance and configure Railway backups/monitoring for production.
+- Upgrade Render to a paid, always-on instance and configure Railway backups/monitoring before using this as production.
 - The frontend build currently succeeds but reports that its initial bundle is above Angular's 500 kB warning budget.
