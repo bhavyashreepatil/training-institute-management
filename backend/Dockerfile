@@ -1,15 +1,11 @@
-FROM maven:3.9-eclipse-temurin-25 AS build
-
-WORKDIR /workspace
+FROM maven:3.9.9-eclipse-temurin-25 AS build
+WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-RUN mvn -B verify
+RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:25-jre
-
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
-COPY --from=build /workspace/target/management-0.0.1-SNAPSHOT.jar app.jar
-USER 10001:10001
-ENV PORT=10000
-EXPOSE 10000
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar", "--spring.jpa.hibernate.ddl-auto=update"]

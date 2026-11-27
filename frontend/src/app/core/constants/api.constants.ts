@@ -1,12 +1,4 @@
-declare global {
-  interface Window {
-    __APP_CONFIG__?: {
-      apiBaseUrl?: string;
-    };
-  }
-}
-
-export const API_BASE_URL = window.__APP_CONFIG__?.apiBaseUrl ?? 'http://localhost:8080/api/v1';
+export const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 export const API_ENDPOINTS = {
   COURSES: `${API_BASE_URL}/courses`,

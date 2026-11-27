@@ -38,7 +38,7 @@ DB_NAME=institute_db
 DB_USERNAME=root
 DB_PASSWORD=your_mysql_password
 SERVER_PORT=8080
-CORS_ALLOWED_ORIGINS=http://localhost:4200
+CORS_ALLOWED_ORIGINS=http://localhost:4200,http://127.0.0.1:4200
 ```
 
 ### Frontend (`frontend/.env.example`)
@@ -101,8 +101,6 @@ npm.cmd test -- --watch=false --browsers=ChromeHeadless
 ```
 
 ## Documentation & Postman
-
-- **Production Deployment:** [documentation/PRODUCTION_DEPLOYMENT.md](documentation/PRODUCTION_DEPLOYMENT.md)
 
 - **REST API Reference:** [documentation/API_DOCUMENTATION.md](documentation/API_DOCUMENTATION.md)
 - **Database Design & ER Diagram:** [documentation/DATABASE_DESIGN.md](documentation/DATABASE_DESIGN.md)

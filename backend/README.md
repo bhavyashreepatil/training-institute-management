@@ -2,8 +2,6 @@
 
 Spring Boot 3.5.x REST API for the Training Institute Course and Batch Management System.
 
-Requires JDK 25 LTS.
-
 ## Environment Variables
 
 Configure the following environment variables (see `.env.example`):
@@ -14,7 +12,7 @@ Configure the following environment variables (see `.env.example`):
 - `DB_USERNAME` (default: `root`)
 - `DB_PASSWORD`
 - `SERVER_PORT` (default: `8080`)
-- `CORS_ALLOWED_ORIGINS` (default: `http://localhost:4200`)
+- `CORS_ALLOWED_ORIGINS` (default: `http://localhost:4200,http://127.0.0.1:4200`)
 
 ## Commands (Windows PowerShell)
 

@@ -2,8 +2,6 @@
 
 # Compiled output
 /dist
-/public/app-config.js
-/.vercel
 /tmp
 /out-tsc
 /bazel-out
